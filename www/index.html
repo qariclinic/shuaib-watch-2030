@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="ur" dir="rtl"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>اسلامک شعیب ڈیجیٹل واچ 2030</title>
+<style>
+:root{--bg:#04201a;--bg2:#0a3d33;--gold:#e6c36a;--txt:#f4efe0;--card:#ffffff12}
+*{box-sizing:border-box;margin:0}
+body{font-family:"Noto Naskh Arabic","Noto Nastaliq Urdu",serif;background:radial-gradient(circle at 50% 0,var(--bg2),var(--bg));color:var(--txt);min-height:100vh;padding:env(safe-area-inset-top) 12px 80px}
+header{text-align:center;padding:14px 0 4px}
+header h1{color:var(--gold);font-size:1.5rem}
+header small{opacity:.7}
+.badge{display:inline-block;border:1px solid var(--gold);color:var(--gold);border-radius:20px;padding:1px 12px;font-size:.8rem;margin-top:4px}
+.ticker{overflow:hidden;white-space:nowrap;background:#00000055;border:1px solid #e6c36a55;border-radius:10px;margin:10px 0;padding:8px 0}
+.ticker span{display:inline-block;padding-right:100%;animation:mv 28s linear infinite;color:var(--gold);font-size:1.1rem}
+@keyframes mv{from{transform:translateX(-100%)}to{transform:translateX(100%)}}
+.grid{display:grid;gap:12px;grid-template-columns:repeat(auto-fit,minmax(290px,1fr));max-width:1000px;margin:auto}
+.card{background:var(--card);border:1px solid #e6c36a40;border-radius:18px;padding:14px;backdrop-filter:blur(6px)}
+.digital{font-family:"Courier New",monospace;direction:ltr;text-align:center;font-size:2.8rem;color:var(--gold);letter-spacing:2px;text-shadow:0 0 14px #e6c36a77}
+.digital small{font-size:1.1rem}
+.dates{text-align:center;line-height:1.9}
+.hl{margin-top:6px;padding:6px;border-radius:10px;background:linear-gradient(90deg,#b8860b,#e6c36a);color:#201800;font-weight:bold;display:none}
+svg{display:block;margin:auto;width:100%;max-width:300px}
+.pr{display:flex;justify-content:space-between;padding:8px 10px;border-radius:10px;margin:4px 0;background:#ffffff0a}
+.pr.next{background:#e6c36a33;border:1px solid var(--gold)}
+.pr.now{background:#1fa26a55}
+.wx{display:flex;justify-content:space-around;align-items:center;font-size:1.2rem;text-align:center}
+.wx b{font-size:2rem;color:var(--gold);direction:ltr;display:block}
+input,button{font:inherit;border-radius:10px;border:1px solid var(--gold);background:#00000055;color:var(--txt);padding:6px 10px}
+button{background:var(--gold);color:#201800;cursor:pointer}
+.al{display:flex;justify-content:space-between;align-items:center;margin:5px 0}
+footer{position:fixed;bottom:0;left:0;right:0;text-align:center;background:#000000cc;color:var(--gold);padding:8px 6px calc(8px + env(safe-area-inset-bottom));font-size:.9rem;border-top:1px solid var(--gold)}
+</style></head><body>
+<header><h1>🕌 اسلامک شعیب ڈیجیٹل واچ</h1><span class="badge">نیو ماڈل 2030 ایڈیشن</span></header>
+<div class="ticker"><span>📵 براہِ کرم موبائل بند کریں &nbsp;✦&nbsp; سُبْحَانَ اللّٰه &nbsp;✦&nbsp; اَلْحَمْدُ لِلّٰه &nbsp;✦&nbsp; اَللّٰهُ اَکْبَر &nbsp;✦&nbsp; لَا إِلٰهَ إِلَّا اللّٰه &nbsp;✦&nbsp; 📵 مسجد میں موبائل بند رکھیں &nbsp;✦&nbsp; سُبْحَانَ اللّٰهِ وَبِحَمْدِهِ &nbsp;✦&nbsp; اَللّٰهُ اَکْبَر</span></div>
+<div class="grid">
+ <div class="card"><div class="digital" id="dig">--:--:--</div>
+  <div class="dates"><div id="greg"></div><div id="hij" style="color:var(--gold);font-size:1.2rem"></div><div class="hl" id="hl"></div></div></div>
+ <div class="card"><svg viewBox="-110 -110 220 220" id="clk"></svg></div>
+ <div class="card"><div class="wx"><div><b id="tf">--°F</b>درجۂ حرارت</div><div><span id="wi">⛅</span><div id="wt">موسم</div></div></div><div id="loc" style="text-align:center;opacity:.7;font-size:.85rem;margin-top:6px"></div></div>
+ <div class="card"><h3 style="color:var(--gold)">اوقاتِ نماز</h3><div id="prayers"></div><div id="nextin" style="text-align:center;margin-top:6px"></div></div>
+ <div class="card"><h3 style="color:var(--gold)">⏰ الارم</h3>
+  <div style="display:flex;gap:8px;margin:8px 0"><input type="time" id="at"><input id="al" placeholder="لیبل" style="flex:1"><button onclick="addA()">شامل</button></div><div id="alist"></div></div>
+</div>
+<footer>تیار کردہ: مفتی حافظ محمد شعیب خان آلائی &nbsp;|&nbsp; Made by Mufti Hafiz Muhammad Shuaib Khan Alai &nbsp;|&nbsp; 2030</footer>
+<audio id="adhan" src="audio/adhan.mp3" preload="auto"></audio>
+<script>
+const $=id=>document.getElementById(id),p2=n=>String(n).padStart(2,'0');
+const NAMES={Fajr:'فجر',Dhuhr:'ظہر',Asr:'عصر',Maghrib:'مغرب',Isha:'عشاء'};
+let T={},coords=JSON.parse(localStorage.getItem('co')||'{"lat":34.68,"lon":73.02}'),fired={};
+const HM=['محرم','صفر','ربیع الاول','ربیع الثانی','جمادی الاولیٰ','جمادی الثانیہ','رجب','شعبان','رمضان','شوال','ذوالقعدہ','ذوالحجہ'];
+function hijri(d){const f=new Intl.DateTimeFormat('en-u-ca-islamic-umalqura-nu-latn',{day:'numeric',month:'numeric',year:'numeric'}).formatToParts(d),g=t=>+f.find(x=>x.type===t).value;return{d:g('day'),m:g('month'),y:g('year')}}
+function special(h){const k=h.m+'-'+h.d;const M={'1-1':'🌙 اسلامی نیا سال مبارک','1-10':'یومِ عاشوراء','3-12':'🌟 12 ربیع الاول','7-27':'✨ شبِ معراج','8-15':'🌕 شبِ برأت','9-27':'🌠 شبِ قدر (متوقع)','10-1':'🎉 عید الفطر مبارک','10-2':'🎉 عید الفطر','10-3':'🎉 عید الفطر','12-9':'⛰️ یومِ عرفہ','12-10':'🐑 عید الاضحیٰ مبارک','12-11':'🐑 ایامِ تشریق/عید الاضحیٰ','12-12':'🐑 عید الاضحیٰ'};
+ if(M[k])return M[k];if(h.m===9)return '🌙 رمضان المبارک — روزہ نمبر '+h.d;if([13,14,15].includes(h.d))return '⚪ ایامِ بیض — روزے کی سنت';return ''}
+function dial(){let s='<circle r="106" fill="#031a15" stroke="#e6c36a" stroke-width="3"/>';
+ for(let i=0;i<60;i++){const a=i*6*Math.PI/180,l=i%5?3:9,r=100;s+=`<line x1="${Math.sin(a)*r}" y1="${-Math.cos(a)*r}" x2="${Math.sin(a)*(r-l)}" y2="${-Math.cos(a)*(r-l)}" stroke="#e6c36a" stroke-width="${i%5?.6:1.8}"/>`}
+ for(let i=1;i<=12;i++){const a=i*30*Math.PI/180;s+=`<text x="${Math.sin(a)*74}" y="${-Math.cos(a)*74+5}" fill="#f4efe0" font-size="14" text-anchor="middle">${i}</text>`}
+ for(const k in T){const [h,m]=T[k].split(':').map(Number),a=((h%12)+m/60)*30*Math.PI/180;
+  s+=`<circle cx="${Math.sin(a)*90}" cy="${-Math.cos(a)*90}" r="4" fill="#1fd68a"/><text x="${Math.sin(a)*55}" y="${-Math.cos(a)*55+3}" fill="#1fd68a" font-size="9" text-anchor="middle">${NAMES[k]}</text>`}
+ s+='<line id="hh" y2="-45" stroke="#fff" stroke-width="4" stroke-linecap="round"/><line id="mh" y2="-68" stroke="#e6c36a" stroke-width="3" stroke-linecap="round"/><line id="sh" y2="-80" stroke="#ff5a5a" stroke-width="1.2"/><circle r="4" fill="#e6c36a"/>';$('clk').innerHTML=s}
+function tick(){const n=new Date(),H=n.getHours(),M=n.getMinutes(),S=n.getSeconds();
+ $('dig').innerHTML=p2(H%12||12)+':'+p2(M)+':'+p2(S)+' <small>'+(H<12?'AM':'PM')+'</small>';
+ $('greg').textContent=n.toLocaleDateString('ur-PK',{weekday:'long',day:'numeric',month:'long',year:'numeric'});
+ const h=hijri(n);$('hij').textContent=h.d+' '+HM[h.m-1]+' '+h.y+' ھ';
+ const sp=special(h);$('hl').style.display=sp?'block':'none';$('hl').textContent=sp;
+ const r=(id,d)=>{const e=$(id);if(e)e.setAttribute('transform','rotate('+d+')')};
+ r('hh',((H%12)+M/60)*30);r('mh',(M+S/60)*6);r('sh',S*6);
+ const hm=p2(H)+':'+p2(M),key=n.toDateString()+hm;
+ if(S<2){for(const k in T)if(T[k]===hm&&!fired[key+k]){fired[key+k]=1;playAdhan(k)}
+  getA().forEach(a=>{if(a.on&&a.t===hm&&!fired[key+'a'+a.t]){fired[key+'a'+a.t]=1;beep(8);alert('⏰ '+(a.l||'الارم'))}})}
+ hl();}
+function hl(){const n=new Date(),c=n.getHours()*60+n.getMinutes();let nx=null,cur=null;
+ for(const k in T){const [h,m]=T[k].split(':').map(Number),t=h*60+m;if(t<=c)cur=k;if(t>c&&!nx)nx={k,t}}
+ document.querySelectorAll('.pr').forEach(e=>{e.className='pr'+(e.dataset.k===(nx&&nx.k)?' next':e.dataset.k===cur?' now':'')});
+ if(nx){const d=nx.t-c;$('nextin').textContent='اگلی نماز '+NAMES[nx.k]+' — '+Math.floor(d/60)+' گھنٹے '+d%60+' منٹ بعد'}else $('nextin').textContent='اگلی نماز: کل فجر'}
+function f12(t){const [h,m]=t.split(':').map(Number);return p2(h%12||12)+':'+p2(m)+(h<12?' AM':' PM')}
+async function prayers(){const d=new Date();const key='pt'+d.toDateString()+coords.lat.toFixed(1);let j=localStorage.getItem(key);
+ try{if(!j){const u=`https://api.aladhan.com/v1/timings/${d.getDate()}-${d.getMonth()+1}-${d.getFullYear()}?latitude=${coords.lat}&longitude=${coords.lon}&method=1&school=1`;j=JSON.stringify((await (await fetch(u)).json()).data.timings);localStorage.setItem(key,j)}}
+ catch(e){j=localStorage.getItem('ptlast')}
+ if(!j)return;localStorage.setItem('ptlast',j);const t=JSON.parse(j);T={};for(const k in NAMES)T[k]=t[k].slice(0,5);
+ $('prayers').innerHTML=Object.keys(T).map(k=>`<div class="pr" data-k="${k}"><span>${NAMES[k]}</span><b dir="ltr">${f12(T[k])}</b></div>`).join('');dial();}
+async function weather(){try{const w=await (await fetch(`https://api.open-meteo.com/v1/forecast?latitude=${coords.lat}&longitude=${coords.lon}&current=temperature_2m,weather_code&temperature_unit=fahrenheit`)).json();
+ const c=w.current,x=c.weather_code,m=x==0?['☀️','صاف']:x<4?['⛅','جزوی ابر آلود']:x<50?['🌫️','دھند']:x<70?['🌧️','بارش']:x<80?['❄️','برف']:['⛈️','طوفان'];
+ $('tf').textContent=Math.round(c.temperature_2m)+'°F';$('wi').textContent=m[0];$('wt').textContent=m[1];localStorage.setItem('wx',JSON.stringify([$('tf').textContent,m]))}catch(e){const s=JSON.parse(localStorage.getItem('wx')||'null');if(s){$('tf').textContent=s[0];$('wi').textContent=s[1][0];$('wt').textContent=s[1][1]}}
+ $('loc').textContent='📍 '+coords.lat.toFixed(2)+', '+coords.lon.toFixed(2)}
+function beep(n){try{const c=new AudioContext();for(let i=0;i<n;i++){const o=c.createOscillator();o.connect(c.destination);o.frequency.value=880;o.start(c.currentTime+i*.5);o.stop(c.currentTime+i*.5+.3)}}catch(e){}}
+function playAdhan(k){const a=$('adhan');a.play().catch(()=>beep(5));if('Notification'in window&&Notification.permission==='granted')new Notification('اذان — '+NAMES[k])}
+const getA=()=>JSON.parse(localStorage.getItem('al')||'[]');
+function addA(){if(!$('at').value)return;const a=getA();a.push({t:$('at').value,l:$('al').value,on:true});localStorage.setItem('al',JSON.stringify(a));rA()}
+function rA(){$('alist').innerHTML=getA().map((a,i)=>`<div class="al"><span dir="ltr">${f12(a.t)}</span><span>${a.l||''}</span><span><input type="checkbox" ${a.on?'checked':''} onchange="tg(${i})"> <button onclick="dl(${i})">✕</button></span></div>`).join('')}
+function tg(i){const a=getA();a[i].on=!a[i].on;localStorage.setItem('al',JSON.stringify(a))}
+function dl(i){const a=getA();a.splice(i,1);localStorage.setItem('al',JSON.stringify(a));rA()}
+navigator.geolocation&&navigator.geolocation.getCurrentPosition(p=>{coords={lat:p.coords.latitude,lon:p.coords.longitude};localStorage.setItem('co',JSON.stringify(coords));prayers();weather()},()=>{});
+'Notification'in window&&Notification.requestPermission();
+document.addEventListener('click',()=>{const a=$('adhan');a.muted=false},{once:true});
+dial();rA();prayers();weather();tick();setInterval(tick,1000);setInterval(weather,900000);setInterval(prayers,3600000);
+</script></body></html>
